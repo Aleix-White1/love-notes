@@ -141,7 +141,10 @@ app.get('/api/stats', (req, res) => {
 
 // SPA fallback — must be last
 if (fs.existsSync(FRONTEND_DIST)) {
-  app.get('*', (_, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')))
+  app.use((req, res) => {
+  res.sendFile(path.join(FRONTEND_DIST, 'index.html'))
+})
+
 }
 
 // ── Start ──────────────────────────────────────────────────────────────────────
