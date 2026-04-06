@@ -33,13 +33,14 @@ export default function NoteDetail({ note, onClose, onToggleFav, onDelete }) {
       zIndex: 200,
       display: 'flex',
       flexDirection: 'column',
-      maxWidth: '480px',
-      left: '50%',
-      transform: 'translateX(-50%)',
+      width: '100%',
+      height: '100dvh', // 👈 mejor que 100vh en móviles
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
+
       {/* Top bar */}
       <div style={{
-        background: 'rgba(26,20,16,0.97)',
         padding: '14px 16px',
         display: 'flex',
         justifyContent: 'space-between',
@@ -51,91 +52,144 @@ export default function NoteDetail({ note, onClose, onToggleFav, onDelete }) {
           fontFamily: "'Playfair Display', serif",
           fontStyle: 'italic',
           color: '#F5ECD7',
-          fontSize: '15px',
-        }}>{formatDate(note.date)}</span>
+          fontSize: 'clamp(13px, 3vw, 15px)', // 👈 responsive
+        }}>
+          {formatDate(note.date)}
+        </span>
+
         <button onClick={onClose} style={{
-          background: 'none', border: 'none',
-          color: '#9A8878', fontSize: '24px',
-          lineHeight: 1, padding: '2px 8px', cursor: 'pointer',
+          background: 'none',
+          border: 'none',
+          color: '#9A8878',
+          fontSize: '26px',
+          padding: '4px 8px',
         }}>×</button>
       </div>
 
-      {/* Image */}
+      {/* Content scrollable */}
       <div style={{
         flex: 1,
+        overflowY: 'auto', // 👈 scroll real
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: 'column',
         justifyContent: 'center',
-        overflow: 'hidden',
         padding: '16px',
+        gap: '16px',
       }}>
-        {imgSrc ? (
-          <img
-            src={imgSrc}
-            alt={note.subtitle}
-            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '10px' }}
-          />
-        ) : (
+
+        {/* Image */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          maxHeight: '50vh', // 👈 clave para móvil
+        }}>
+          {imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={note.subtitle}
+              style={{
+                width: '100%',
+                maxHeight: '50vh',
+                objectFit: 'contain',
+                borderRadius: '10px'
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '140px',
+              height: '180px',
+              background: 'linear-gradient(150deg, #3D3028 0%, #2C2420 100%)',
+              borderRadius: '10px',
+              border: '0.5px solid #3D3028',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '48px',
+            }}>
+              {note.emoji}
+            </div>
+          )}
+        </div>
+
+        {/* Text */}
+        <div>
           <div style={{
-            width: '200px', height: '266px',
-            background: 'linear-gradient(150deg, #3D3028 0%, #2C2420 100%)',
-            borderRadius: '10px',
-            border: '0.5px solid #3D3028',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '64px',
-          }}>{note.emoji}</div>
-        )}
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: 'italic',
+            fontSize: 'clamp(18px, 5vw, 22px)',
+            color: '#F5ECD7',
+            marginBottom: '4px',
+          }}>
+            {note.subtitle}
+          </div>
+
+          <div style={{
+            fontSize: '12px',
+            color: '#9A8878'
+          }}>
+            {formatDate(note.date)}
+          </div>
+        </div>
+
       </div>
 
-      {/* Bottom */}
+      {/* Bottom actions */}
       <div style={{
-        background: 'rgba(26,20,16,0.98)',
-        padding: '16px 20px 36px',
+        padding: '16px',
         borderTop: '0.5px solid #3D3028',
-        flexShrink: 0,
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '8px',
       }}>
-        <div style={{
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: 'italic',
-          fontSize: '20px',
-          color: '#F5ECD7',
-          marginBottom: '4px',
-        }}>{note.subtitle}</div>
-        <div style={{ fontSize: '12px', color: '#9A8878' }}>{formatDate(note.date)}</div>
 
-        <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-          <button onClick={() => onToggleFav(note.id)} style={{
-            flex: 1,
+        {/* Fav */}
+        <button
+          onClick={() => onToggleFav(note.id)}
+          style={{
             background: 'transparent',
             border: note.fav ? '1px solid #C9704A' : '0.5px solid #3D3028',
             color: note.fav ? '#C9704A' : '#9A8878',
-            fontFamily: "'Lato', sans-serif",
-            fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase',
-            padding: '10px 4px', borderRadius: '6px', cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}>{note.fav ? '♥ favorito' : '♡ favorito'}</button>
+            fontSize: '12px',
+            padding: '12px',
+            borderRadius: '8px',
+          }}
+        >
+          {note.fav ? '♥ favorito' : '♡ favorito'}
+        </button>
 
-          <button onClick={handleDelete} disabled={deleting} style={{
-            flex: 1,
+        {/* Delete */}
+        <button
+          onClick={handleDelete}
+          disabled={deleting}
+          style={{
             background: confirmDelete ? '#4A1B0C' : 'transparent',
             border: confirmDelete ? '1px solid #C9704A' : '0.5px solid #3D3028',
             color: confirmDelete ? '#F5ECD7' : '#9A8878',
-            fontFamily: "'Lato', sans-serif",
-            fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase',
-            padding: '10px 4px', borderRadius: '6px', cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}>{deleting ? '…' : confirmDelete ? '¿seguro?' : '✕ eliminar'}</button>
+            fontSize: '12px',
+            padding: '12px',
+            borderRadius: '8px',
+          }}
+        >
+          {deleting ? '…' : confirmDelete ? '¿seguro?' : '✕ eliminar'}
+        </button>
 
-          <button onClick={onClose} style={{
-            flex: 1,
+        {/* Back full width */}
+        <button
+          onClick={onClose}
+          style={{
+            gridColumn: 'span 2',
             background: 'transparent',
             border: '0.5px solid #3D3028',
             color: '#9A8878',
-            fontFamily: "'Lato', sans-serif",
-            fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase',
-            padding: '10px 4px', borderRadius: '6px', cursor: 'pointer',
-          }}>volver</button>
-        </div>
+            fontSize: '12px',
+            padding: '12px',
+            borderRadius: '8px',
+          }}
+        >
+          volver
+        </button>
+
       </div>
     </div>
   )
